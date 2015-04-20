@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Use echo -e "$(./control/projector.sh status)\n\n" to print all output at once, rather than as it comes
+# Use echo -e "$(~/control/projector.sh status)\n\n" to print all output at once, rather than as it comes
 # (for some reason we lose the final two blank lines from the output, hence the \n\n !)
 # (could add an '&' at the end to run command in the background, in case it locks up for some reason..?)
 
@@ -272,7 +272,7 @@ power () {
 
 	header "Projector: ${COMMAND}"
 	
-	# Power status
+	# Power control
 	RES=$(pjlink "${PJ_COMMAND}")
 	case ${RES:16} in
 		0)    STATUS="Stand-by";;
@@ -311,7 +311,7 @@ shutter () {
 
 	header "Projector: ${COMMAND}"
 	
-	# Shutter status
+	# Shutter control
 	RES=$(pjlink "${PJ_COMMAND}")
 	case ${RES:16} in
 		11)   STATUS="Shutter closed (Video Mute On)";;
