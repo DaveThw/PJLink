@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Use echo -e "$(~/control/projector.sh status)\n\n" to print all output at once, rather than as it comes
+# Use echo -e "$(./control/projector.sh status)\n\n" to print all output at once, rather than as it comes
 # (for some reason we lose the final two blank lines from the output, hence the \n\n !)
 # (could add an '&' at the end to run command in the background, in case it locks up for some reason..?)
 
@@ -56,43 +56,43 @@ status () {
 	# Power status
 	RES=$(pjlink "%1POWR ?")
 	case ${RES:16} in
-		0) STATUS="Stand-by";;
-		1) STATUS="Power on";;
-		2) STATUS="Cooling down";;
-		3) STATUS="Warming up";;
+		0)   STATUS="Stand-by";;
+		1)   STATUS="Power on";;
+		2)   STATUS="Cooling down";;
+		3)   STATUS="Warming up";;
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)  STATUS="Unrecognised status!";;
+		*)    STATUS="Unrecognised status!";;
 	esac
 	echo "Power:                  ${STATUS}"
 	
 	# Input status
 	RES=$(pjlink "%1INPT ?")
 	case ${RES:16} in
-		11) STATUS="11: RGB 1 (Component)";;
-		12) STATUS="12: RGB 2 (VGA)";;
-		21) STATUS="21: Video 1 (Composite Video)";;
-		22) STATUS="22: Video 2 (S-Video)";;
-		31) STATUS="31: Digital 1 (DVI-D)";;
+		11)   STATUS="11: RGB 1 (Component)";;
+		12)   STATUS="12: RGB 2 (VGA)";;
+		21)   STATUS="21: Video 1 (Composite Video)";;
+		22)   STATUS="22: Video 2 (S-Video)";;
+		31)   STATUS="31: Digital 1 (DVI-D)";;
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)  STATUS="Unrecognised status! (${RES:16})";;
+		*)    STATUS="Unrecognised status! (${RES:16})";;
 	esac
 	echo "Input:                  ${STATUS}"
 	
 	# Shutter status
 	RES=$(pjlink "%1AVMT ?")
 	case ${RES:16} in
-		11)   STATUS="Video Mute On (Shutter closed?)";;
-		21)   STATUS="Audio Mute On";;
+		11)   STATUS="Audio Mute Off; Video Mute On";;
+		21)   STATUS="Audio Mute On; Video Mute Off";;
 		31)   STATUS="Audio and Video Mute On - Shutter closed";;
 		30)   STATUS="Audio and Video Mute Off - Shutter open";;
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)  STATUS="Unrecognised status! (${RES:16})";;
+		*)    STATUS="Unrecognised status! (${RES:16})";;
 	esac
 	echo "AV Mute / Shutter:      ${STATUS}"
 	
@@ -196,7 +196,7 @@ status () {
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)  STATUS="${RES:16}";;
+		*)    STATUS="${RES:16}";;
 	esac
 	echo "Input List:             ${STATUS}"
 	
@@ -206,7 +206,7 @@ status () {
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)  STATUS="${RES:16}";;
+		*)    STATUS="${RES:16}";;
 	esac
 	echo "Projector Name:         ${STATUS}"
 	
@@ -216,7 +216,7 @@ status () {
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)  STATUS="${RES:16}";;
+		*)    STATUS="${RES:16}";;
 	esac
 	echo "Projector Manufacturer: ${STATUS}"
 	
@@ -226,7 +226,7 @@ status () {
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)  STATUS="${RES:16}";;
+		*)    STATUS="${RES:16}";;
 	esac
 	echo "Projector Model:        ${STATUS}"
 	
@@ -236,7 +236,7 @@ status () {
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)  STATUS="${RES:16}";;
+		*)    STATUS="${RES:16}";;
 	esac
 	echo "Other Projector Info:   ${STATUS}"
 	
@@ -246,7 +246,7 @@ status () {
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)  STATUS="${RES:16}";;
+		*)    STATUS="${RES:16}";;
 	esac
 	echo "PJLink Class:           ${STATUS}"
 	
@@ -311,13 +311,13 @@ shutter () {
 
 	header "Projector: ${COMMAND}"
 	
-	# Power status
+	# Shutter status
 	RES=$(pjlink "${PJ_COMMAND}")
 	case ${RES:16} in
-		11)   STATUS="Video Mute On (Shutter closed?)";;
-		21)   STATUS="Audio Mute On";;
-		31)   STATUS="Audio and Video Mute On - Shutter closed";;
-		30)   STATUS="Audio and Video Mute Off - Shutter open";;
+		11)   STATUS="Shutter closed (Video Mute On)";;
+		21)   STATUS="Shutter open (Audio Mute On)";;
+		31)   STATUS="Shutter closed (Audio and Video Mute On)";;
+		30)   STATUS="Shutter open (Audio and Video Mute Off)";;
 		OK)   STATUS="Done!";;
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR2) STATUS="Projector didn't recognise parameter!";;
