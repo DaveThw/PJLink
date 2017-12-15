@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Use echo -e "$(~/control/projector.sh status)\n\n" to print all output at once, rather than as it comes
+# Use echo -e "$(~/Applications/PJLink/projector.sh status)\n\n" to print all output at once, rather than as it comes
 # (for some reason we lose the final two blank lines from the output, hence the \n\n !)
 # (could add an '&' at the end to run command in the background, in case it locks up for some reason..?)
 
@@ -35,8 +35,9 @@ PJLINK_PORT=4352
 
 # usage: pjlink command
 pjlink () {
-	echo -en "${1}\r" | nc -n4 ${IP_ADDRESS} ${PJLINK_PORT} | tr '\r' '\n'
+	echo -en "${1}\r" | nc -n4 -w 1 ${IP_ADDRESS} ${PJLINK_PORT} | tr '\r' '\n'
 }
+# Result should be something like: "PJLINK 0\n%1INPT=12"
 
 # usage: header human-friendly-command
 header () {
@@ -45,13 +46,15 @@ header () {
 
 # usage: footer
 footer () {
-	printf "\n\n"
+	printf " \n \n"
 }
 
 status () {
 	header "Projector: Status"
 	
 	echo "Projector Status:"
+	echo "IP Address:             ${IP_ADDRESS}"
+	echo "Port:                   ${PJLINK_PORT}"
 
 	# Power status
 	RES=$(pjlink "%1POWR ?")
@@ -63,10 +66,11 @@ status () {
 		ERR1) STATUS="Projector didn't recognise command!";;
 		ERR3) STATUS="Unable to get status at this time";;
 		ERR4) STATUS="Projector Failure";;
-		*)    STATUS="Unrecognised status!";;
+		*)    STATUS="Unrecognised status! (${RES})";;
 	esac
 	echo "Power:                  ${STATUS}"
-	
+	RES=$(pjlink)
+
 	# Input status
 	RES=$(pjlink "%1INPT ?")
 	case ${RES:16} in
@@ -81,6 +85,7 @@ status () {
 		*)    STATUS="Unrecognised status! (${RES:16})";;
 	esac
 	echo "Input:                  ${STATUS}"
+	RES=$(pjlink)
 	
 	# Shutter status
 	RES=$(pjlink "%1AVMT ?")
@@ -95,6 +100,7 @@ status () {
 		*)    STATUS="Unrecognised status! (${RES:16})";;
 	esac
 	echo "AV Mute / Shutter:      ${STATUS}"
+	RES=$(pjlink)
 	
 	# Error status
 	RES=$(pjlink "%1ERST ?")
@@ -146,6 +152,7 @@ status () {
 		   echo "                        Other:       ${STATUS}"
 		   ;;
 	esac
+	RES=$(pjlink)
 
 	# Lamp status
 	RES=$(pjlink "%1LAMP ?")
@@ -189,6 +196,7 @@ status () {
 			echo "Lamp Status:            No information returned"
 		    fi;;
 	esac
+	RES=$(pjlink)
 	
 	# Input List
 	RES=$(pjlink "%1INST ?")
@@ -199,6 +207,7 @@ status () {
 		*)    STATUS="${RES:16}";;
 	esac
 	echo "Input List:             ${STATUS}"
+	RES=$(pjlink)
 	
 	# Projector Name
 	RES=$(pjlink "%1NAME ?")
@@ -209,6 +218,7 @@ status () {
 		*)    STATUS="${RES:16}";;
 	esac
 	echo "Projector Name:         ${STATUS}"
+	RES=$(pjlink)
 	
 	# Projector Manufacturer
 	RES=$(pjlink "%1INF1 ?")
@@ -219,6 +229,7 @@ status () {
 		*)    STATUS="${RES:16}";;
 	esac
 	echo "Projector Manufacturer: ${STATUS}"
+	RES=$(pjlink)
 	
 	# Projector Model
 	RES=$(pjlink "%1INF2 ?")
@@ -229,6 +240,7 @@ status () {
 		*)    STATUS="${RES:16}";;
 	esac
 	echo "Projector Model:        ${STATUS}"
+	RES=$(pjlink)
 	
 	# Other Projector Info
 	RES=$(pjlink "%1INFO ?")
@@ -239,6 +251,7 @@ status () {
 		*)    STATUS="${RES:16}";;
 	esac
 	echo "Other Projector Info:   ${STATUS}"
+	RES=$(pjlink)
 	
 	# PJLink Class
 	RES=$(pjlink "%1CLSS ?")
@@ -249,6 +262,7 @@ status () {
 		*)    STATUS="${RES:16}";;
 	esac
 	echo "PJLink Class:           ${STATUS}"
+	RES=$(pjlink)
 	
 	footer
 }
@@ -345,8 +359,8 @@ case $COMMAND in
 		;;
 	power)	case $PARAMETER in
 			on|off|of|-s|status|1|0|?)
-				if [ $# -ge 3 ]; then IP_ADDRESS=$2; fi
-				if [ $# -ge 4 ]; then PJLINK_PORT=$3; fi
+				if [ $# -ge 3 ]; then IP_ADDRESS=$3; fi
+				if [ $# -ge 4 ]; then PJLINK_PORT=$4; fi
 				if [ $# -gt 4 ]; then echo "Error: Too many parameters!"; usage; exit; fi
 				power "$PARAMETER"
 				;;
@@ -360,8 +374,8 @@ case $COMMAND in
 		;;
 	shutter) case $PARAMETER in
 			on|off|open|close|-o|-c|-s|status|1|0|?)
-				if [ $# -ge 3 ]; then IP_ADDRESS=$2; fi
-				if [ $# -ge 4 ]; then PJLINK_PORT=$3; fi
+				if [ $# -ge 3 ]; then IP_ADDRESS=$3; fi
+				if [ $# -ge 4 ]; then PJLINK_PORT=$4; fi
 				if [ $# -gt 4 ]; then echo "Error: Too many parameters!"; usage; exit; fi
 				shutter "$PARAMETER"
 				;;
